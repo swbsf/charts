@@ -335,6 +335,7 @@ The following tables lists the configurable parameters of the Thanos chart and t
 | `storegateway.config`                                | Thanos Store Gateway cache configuration                                                               | `nil`                                                   |
 | `storegateway.existingConfigmap`                     | Name of existing ConfigMap with Thanos Store Gateway cache configuration                               | `nil`                                                   |
 | `storegateway.updateStrategyType`                    | Statefulset Update Strategy Type                                                                       | `RollingUpdate`                                         |
+| `storegateway.podManagementPolicy`                   | Statefulset Pod Management Policy Type                                                                 | `OrderedReady`                                          |
 | `storegateway.replicaCount`                          | Number of Thanos Store Gateway replicas to deploy                                                      | `1`                                                     |
 | `storegateway.affinity`                              | Affinity for pod assignment                                                                            | `{}` (evaluated as a template)                          |
 | `storegateway.nodeSelector`                          | Node labels for pod assignment                                                                         | `{}` (evaluated as a template)                          |
@@ -388,6 +389,7 @@ The following tables lists the configurable parameters of the Thanos chart and t
 | `ruler.config`                                       | Ruler configuration                                                                                    | `nil`                                                   |
 | `ruler.existingConfigmap`                            | Name of existing ConfigMap with Ruler configuration                                                    | `nil`                                                   |
 | `ruler.updateStrategyType`                           | Statefulset Update Strategy Type                                                                       | `RollingUpdate`                                         |
+| `ruler.podManagementPolicy`                          | Statefulset Pod Management Policy Type                                                                 | `OrderedReady`                                          |
 | `ruler.replicaCount`                                 | Number of Thanos Ruler replicas to deploy                                                              | `1`                                                     |
 | `ruler.affinity`                                     | Affinity for pod assignment                                                                            | `{}` (evaluated as a template)                          |
 | `ruler.nodeSelector`                                 | Node labels for pod assignment                                                                         | `{}` (evaluated as a template)                          |
@@ -628,6 +630,10 @@ By default, the chart is configured to use Kubernetes Security Context to automa
 As an alternative, this chart supports using an initContainer to change the ownership of the volumes before mounting it in the final destination.
 
 You can enable this initContainer by setting `volumePermissions.enabled` to `true`.
+
+## Troubleshooting
+
+Find more information about how to deal with common errors related to Bitnami’s Helm charts in [this troubleshooting guide](https://docs.bitnami.com/general/how-to/troubleshoot-helm-chart-issues).
 
 ## Upgrading
 

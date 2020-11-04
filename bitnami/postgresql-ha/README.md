@@ -116,6 +116,22 @@ The following table lists the configurable parameters of the PostgreSQL HA chart
 | `postgresql.upgradeRepmgrExtension`             | Upgrade repmgr extension in the database                                                                                                                                                        | `false`                                                      |
 | `postgresql.pgHbaTrustAll`                      | Configures PostgreSQL HBA to trust every user                                                                                                                                                   | `false`                                                      |
 | `postgresql.syncReplication`                    | Make the replication synchronous. This will wait until the data is synchronized in all the replicas before other query can be run. This ensures the data availability at the expenses of speed. | `false`                                                      |
+| `postgresql.sharedPreloadLibraries`             | Shared preload libraries (comma-separated list)                                                                                                                                                 | `pgaudit, repmgr`                                            |
+| `postgresql.maxConnections`                     | Maximum total connections                                                                                                                                                                       | `nil`                                                        |
+| `postgresql.postgresConnectionLimit`            | Maximum total connections for the postgres user                                                                                                                                                 | `nil`                                                        |
+| `postgresql.dbUserConnectionLimit`              | Maximum total connections for the non-admin user                                                                                                                                                | `nil`                                                        |
+| `postgresql.tcpKeepalivesInterval`              | TCP keepalives interval                                                                                                                                                                         | `nil`                                                        |
+| `postgresql.tcpKeepalivesIdle`                  | TCP keepalives idle                                                                                                                                                                             | `nil`                                                        |
+| `postgresql.tcpKeepalivesCount`                 | TCP keepalives count                                                                                                                                                                            | `nil`                                                        |
+| `postgresql.statementTimeout`                   | Statement timeout                                                                                                                                                                               | `nil`                                                        |
+| `postgresql.pghbaRemoveFilters`                 | Comma-separated list of patterns to remove from the pg_hba.conf file                                                                                                                            | `nil`                                                        |
+| `postgresql.audit.logHostname`                  | Add client hostnames to the log file                                                                                                                                                            | `true`                                                       |
+| `postgresql.audit.logConnections`               | Add client log-in operations to the log file                                                                                                                                                    | `false`                                                      |
+| `postgresql.audit.logDisconnections`            | Add client log-outs operations to the log file                                                                                                                                                  | `false`                                                      |
+| `postgresql.audit.pgAuditLog`                   | Add operations to log using the pgAudit extension                                                                                                                                               | `nil`                                                        |
+| `postgresql.audit.clientMinMessages`            | Message log level to share with the user                                                                                                                                                        | `nil`                                                        |
+| `postgresql.audit.logLinePrefix`                | Template string for the log line prefix                                                                                                                                                         | `nil`                                                        |
+| `postgresql.audit.logTimezone`                  | Timezone for the log timestamps                                                                                                                                                                 | `nil`                                                        |
 | `postgresql.repmgrUsername`                     | PostgreSQL repmgr username                                                                                                                                                                      | `repmgr`                                                     |
 | `postgresql.repmgrPassword`                     | PostgreSQL repmgr password                                                                                                                                                                      | `nil`                                                        |
 | `postgresql.repmgrDatabase`                     | PostgreSQL repmgr database                                                                                                                                                                      | `repmgr`                                                     |
@@ -181,11 +197,20 @@ The following table lists the configurable parameters of the PostgreSQL HA chart
 | `pgpool.minReadySeconds`                        | How many seconds a pod needs to be ready before killing the next, during update                                                                                                                 | `nil`                                                        |
 | `pgpool.adminUsername`                          | Pgpool Admin username                                                                                                                                                                           | `admin`                                                      |
 | `pgpool.adminPassword`                          | Pgpool Admin password                                                                                                                                                                           | `nil`                                                        |
-| `pgpool.maxPool`                                | The maximum number of cached connections in each child process                                                                                                                                  | `15`                                                         |
+| `pgpool.logConnections`                         | Log all client connections                                                                                                                                                                      | `false`                                                      |
+| `pgpool.logHostname`                            | Log the client hostname instead of IP address                                                                                                                                                   | `true`                                                       |
+| `pgpool.logPerNodeStatement`                    | Log every SQL statement for each DB node separately                                                                                                                                             | `false`                                                      |
+| `pgpool.logLinePrefix`                          | Format of the log entry lines                                                                                                                                                                   | `nil`                                                        |
+| `pgpool.clientMinMessages`                      | Log level for clients                                                                                                                                                                           | `error`                                                      |
 | `pgpool.numInitChildren`                        | The number of preforked Pgpool-II server processes.                                                                                                                                             | `32`                                                         |
+| `pgpool.maxPool`                                | The maximum number of cached connections in each child process                                                                                                                                  | `15`                                                         |
+| `pgpool.childMaxConnections`                    | The maximum number of client connections in each child proces                                                                                                                                   | `nil`                                                        |
+| `pgpool.childLifeTime`                          | The time in seconds to terminate a Pgpool-II child process if it remains idle                                                                                                                   | `nil`                                                        |
+| `pgpool.clientIdleLimit`                        | The time in seconds to disconnect a client if it remains idle since the last query                                                                                                              | `nil`                                                        |
+| `pgpool.connectionLifeTime`                     | The time in seconds to terminate the cached connections to the PostgreSQL backend                                                                                                               | `nil`                                                        |
+| `pgpool.useLoadBalancing`                       | If true, use Pgpool Load-Balancing                                                                                                                                                              | `true`                                                       |
 | `pgpool.configuration`                          | Content of pgpool.conf                                                                                                                                                                          | `nil`                                                        |
 | `pgpool.configurationCM`                        | ConfigMap with the Pgpool configuration file (Note: Overrides `pgpol.configuration`). The file used must be named `pgpool.conf`.                                                                | `nil` (The value is evaluated as a template)                 |
-| `pgpool.useLoadBalancing`                       | If true, use Pgpool Load-Balancing                                                                                                                                                              | `true`                                                       |
 | `pgpool.tls.enabled`                            | Enable TLS traffic support for end-client connections                                                                                                                                           | `false`                                                      |
 | `pgpool.tls.preferServerCiphers`                | Whether to use the server's TLS cipher preferences rather than the client's                                                                                                                     | `true`                                                       |
 | `pgpool.tls.certificatesSecret`                 | Name of an existing secret that contains the certificates                                                                                                                                       | `nil`                                                        |
@@ -282,6 +307,19 @@ Bitnami will release a new chart updating its containers if a new version of the
 
 This chart includes a `values-production.yaml` file where you can find some parameters oriented to production configuration in comparison to the regular `values.yaml`:
 
+- Enable audit logging:
+
+```diff
+- postgresql.audit.logConnections: false
++ postgresql.audit.logConnections: true
+- postgresql.audit.logDisconnections: false
++ postgresql.audit.logDisconnections: true
+- pgpool.enableLogConnections: false
++ pgpool.enableLogConnections: true
+- pgpool.enableLogPerNodeStatement: false
++ pgpool.enableLogPerNodeStatement: true
+```
+
 - Enable Newtworkpolicy blocking external access:
 
 ```diff
@@ -346,13 +384,13 @@ TLS for end-client connections can be enabled in the chart by specifying the `pg
 
 For example:
 
-* First, create the secret with the cetificates files:
+- First, create the secret with the cetificates files:
 
     ```console
     kubectl create secret generic certificates-pgpool.tls.secret --from-file=./cert.crt --from-file=./cert.key --from-file=./ca.crt
     ```
 
-* Then, use the following parameters:
+- Then, use the following parameters:
 
     ```console
     pgpool.tls.enabled=true
@@ -471,6 +509,10 @@ This way, the credentials will be available in all of the subcharts.
 The data is persisted by default using PVC templates in the PostgreSQL statefulset. You can disable the persistence setting the `persistence.enabled` parameter to `false`.
 A default `StorageClass` is needed in the Kubernetes cluster to dynamically provision the volumes. Specify another StorageClass in the `persistence.storageClass` or set `persistence.existingClaim` if you have already existing persistent volumes to use.
 
+## Troubleshooting
+
+Find more information about how to deal with common errors related to Bitnami’s Helm charts in [this troubleshooting guide](https://docs.bitnami.com/general/how-to/troubleshoot-helm-chart-issues).
+
 ## Upgrade
 
 It's necessary to specify the existing passwords while performing a upgrade to ensure the secrets are not updated with invalid randomly generated passwords. Remember to specify the existing values of the `postgresql.password` and `postgresql.repmgrPassword` parameters when upgrading the chart:
@@ -485,7 +527,33 @@ $ helm upgrade my-release bitnami/postgresql-ha \
 
 > Note: As general rule, it is always wise to do a backup before the upgrading procedures.
 
+## 5.2.0
+
+A new  version of repmgr (5.2.0) was included. To upgrade to this version, it's necessary to upgrade the repmgr extension installed on the database. To do so, follow the steps below:
+
+- Reduce your PostgreSQL setup to one replica (primary node) and upgrade to `5.2.0`, enabling the repmgr extension upgrade:
+
+```bash
+$ helm upgrade my-release --version 5.2.0 bitnami/postgresql-ha \
+    --set postgresql.password=[POSTGRESQL_PASSWORD] \
+    --set postgresql.repmgrPassword=[REPMGR_PASSWORD] \
+    --set postgresql.replicaCount=1 \
+    --set postgresql.upgradeRepmgrExtension=true
+```
+
+- Scale your PostgreSQL setup to the original number of replicas:
+
+```bash
+$ helm upgrade my-release --version 5.2.0 bitnami/postgresql-ha \
+    --set postgresql.password=[POSTGRESQL_PASSWORD] \
+    --set postgresql.repmgrPassword=[REPMGR_PASSWORD] \
+    --set postgresql.replicaCount=[NUMBER_OF_REPLICAS]
+```
+
+> Note: you need to substitute the placeholders _[POSTGRESQL_PASSWORD]_, and _[REPMGR_PASSWORD]_ with the values obtained from instructions in the installation notes (`helm get notes RELEASE_NAME`).
+
 ## 5.0.0
+
 This release uses parallel deployment for the postgresql statefullset. This should fix the issues related to not being able to restart the cluster under some contions where the master node is not longer node `-0`.
 This version is next major version to v3.x.y
 
@@ -510,6 +578,7 @@ $ helm install my-release \
 ```
 
 ## 4.0.x
+
 Due to an error handling the version numbers these versions are actually part of the 3.x versions and not a new major version.
 
 ## 3.0.0
